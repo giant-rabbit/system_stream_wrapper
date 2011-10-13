@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * Implements hook_stream_wrappers().
+ */
+function system_stream_wrapper_stream_wrappers() {
+  $wrappers['module'] = array(
+    'name' => t('Module files'),
+    'class' => 'ModuleSystemStreamWrapper',
+    'description' => t('Local module files.'),
+    'type' => STREAM_WRAPPERS_READ,
+  );
+  $wrappers['theme'] = array(
+    'name' => t('Theme files'),
+    'class' => 'ThemeSystemStreamWrapper',
+    'description' => t('Local theme files.'),
+    'type' => STREAM_WRAPPERS_READ,
+  );
+  return $wrappers;
+}

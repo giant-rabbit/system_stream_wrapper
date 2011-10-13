@@ -1,0 +1,4 @@
+name = System stream wrapper
+description = Provides a system:// stream wrapper to access files in module, theme, and profile directories.
+core = 7.x
+files[] = SystemStreamWrapper.inc
