@@ -137,7 +137,9 @@ class ProfileSystemStreamWrapper extends SystemStreamWrapper {
     // We cannot use drupal_get_path() here as it actually doesn't work if
     // $type is 'profile'.
     // @see http://drupal.org/node/1006714
-    return 'profiles/' . $this->getSystemName();
+    if ($profile = $this->getSystemName()) {
+      return 'profiles/' . $profile;
+    }
   }
 }
 
@@ -150,6 +152,8 @@ class LibrarySystemStreamWrapper extends SystemStreamWrapper {
    * Implements abstract public function getDirectoryPath()
    */
   public function getDirectoryPath() {
-    return libraries_get_path($this->getSystemName());
+    if ($library = $this->getSystemName()) {
+      return libraries_get_path($library);
+    }
   }
 }
