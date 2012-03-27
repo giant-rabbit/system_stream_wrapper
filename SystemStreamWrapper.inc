@@ -27,8 +27,11 @@ abstract class SystemStreamWrapper extends DrupalLocalStreamWrapper {
     // Remove erroneous leading or trailing, forward-slashes and backslashes.
     $target = trim($target, '\/');
 
-    // Remove the module/theme/profile name form the file path.
-    $target = substr($target, strlen($this->getSystemName()));
+    // Remove the module/theme/profile name form the file path. This is always
+    // the first part of the path.
+    $target = explode('/', $target);
+    array_shift($target);
+    $target = implode('/', $target);
 
     // Trim again.
     $target = trim($target, '\/');
@@ -103,6 +106,26 @@ class ModuleSystemStreamWrapper extends SystemStreamWrapper {
  * Stream wrapper for theme files using theme://.
  */
 class ThemeSystemStreamWrapper extends SystemStreamWrapper {
+
+  /**
+   * Override SystemSteamWrapper::getSystemName() to support theme://current,
+   * theme://default, and theme://admin
+   */
+  protected function getSystemName($uri = NULL) {
+    $name = parent::getSystemName($uri);
+    if ($name == 'current') {
+      return $GLOBALS['theme'];
+    }
+    elseif ($name == 'default') {
+      return variable_get('theme_default', 'stark');
+    }
+    elseif ($name == 'admin') {
+      return variable_get('admin_theme', variable_get('theme_default', 'stark'));
+    }
+    else {
+      return $name;
+    }
+  }
 
   /**
    * Implements abstract public function getDirectoryPath()
