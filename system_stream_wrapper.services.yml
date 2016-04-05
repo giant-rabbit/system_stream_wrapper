@@ -1,0 +1,13 @@
+services:
+  stream_wrapper.module:
+    class: Drupal\system_stream_wrapper\StreamWrapper\ModuleStream
+    tags:
+      - { name: stream_wrapper, scheme: module }
+  stream_wrapper.theme:
+    class: Drupal\system_stream_wrapper\StreamWrapper\ThemeStream
+    tags:
+      - { name: stream_wrapper, scheme: theme }
+  stream_wrapper.profile:
+    class: Drupal\system_stream_wrapper\StreamWrapper\ProfileStream
+    tags:
+      - { name: stream_wrapper, scheme: profile }
