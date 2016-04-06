@@ -26,6 +26,14 @@ class LibraryDiscovery extends ExtensionDiscovery {
   const EXTENSION_TYPE = 'library';
 
   /**
+   * We don't want to affect the static cache of the core ExtensionDiscovery
+   * class, so we keep one separately.
+   *
+   * @var array
+   */
+  protected static $files = array();
+
+  /**
    * {@inheritdoc}
    */
   protected function scanDirectory($dir) {
