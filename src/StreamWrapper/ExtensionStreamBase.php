@@ -91,6 +91,10 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
       $uri = $this->uri;
     }
 
+    if (isset($uri)) {
+      $this->uri = $uri;
+    }
+
     list($scheme) = explode('://', $uri, 2);
     $dirname = dirname($this->getTarget($uri));
     $dirname = $dirname !== '.' ? rtrim("/$dirname", '/') : '';
