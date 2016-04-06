@@ -13,7 +13,7 @@ use Drupal\KernelTests\KernelTestBase;
 /**
  * Tests system stream wrapper functions.
  *
- * @group system
+ * @group system_stream_wrapper
  */
 class ExtensionStreamTest extends KernelTestBase {
 
