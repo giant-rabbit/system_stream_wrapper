@@ -18,6 +18,11 @@ use Drupal\KernelTests\KernelTestBase;
 class ExtensionStreamTest extends KernelTestBase {
 
   /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['system', 'system_stream_wrapper'];
+
+  /**
    * A list of extension stream wrappers keyed by scheme.
    *
    * @var \Drupal\Core\StreamWrapper\StreamWrapperInterface[]
