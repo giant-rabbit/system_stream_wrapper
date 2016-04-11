@@ -114,7 +114,7 @@ class ExtensionStreamTest extends KernelTestBase {
    * Test the extension stream wrapper methods.
    *
    * @param string $uri
-   *   The uri to be tested,
+   *   The uri to be tested.
    * @param string|\InvalidArgumentException $dirname
    *   The expectation for dirname() method.
    * @param string|\InvalidArgumentException $realpath
@@ -149,6 +149,13 @@ class ExtensionStreamTest extends KernelTestBase {
         $this->assertSame($expected,  $this->streamWrappers[$scheme]->$method());
       }
     }
+  }
+
+  /**
+   * Test when dirname() is called directly without setting a URI first.
+   */
+  public function testDirnameAsParameter() {
+    $this->assertEquals('module://system', $this->streamWrappers['module']->dirname('module://system/system.admin.css'));
   }
 
   /**

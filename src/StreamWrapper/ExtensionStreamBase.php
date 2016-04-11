@@ -45,17 +45,9 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    *
    * @return string
    *   The extension name.
-   *
-   * @throws \InvalidArgumentException
-   *   In case of a malformed uri.
    */
   protected function getOwnerName() {
     $uri_parts = explode('://', $this->uri, 2);
-    if (count($uri_parts) === 1) {
-      // The delimiter ('://') was not found in $uri, malformed $uri passed.
-      throw new \InvalidArgumentException("Malformed uri parameter passed: {$this->uri}");
-    }
-
     // Remove the trailing filename from the path.
     $length = strpos($uri_parts[1], '/');
     return ($length === FALSE) ? $uri_parts[1] : substr($uri_parts[1], 0, $length);
@@ -89,6 +81,9 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
   public function dirname($uri = NULL) {
     if (!isset($uri)) {
       $uri = $this->uri;
+    }
+    else {
+      $this->uri = $uri;
     }
 
     if (isset($uri)) {

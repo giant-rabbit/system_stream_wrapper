@@ -7,6 +7,9 @@
 
 namespace Drupal\system_stream_wrapper\StreamWrapper;
 
+/**
+ * Provides common methods for local streams.
+ */
 trait LocalStreamTrait {
 
   /**

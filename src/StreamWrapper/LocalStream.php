@@ -19,32 +19,9 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
  * \Drupal\Core\StreamWrapper\LocalStream implementations need to implement at
  * least the getDirectoryPath() and getExternalUrl() methods.
  */
-abstract class LocalStream implements StreamWrapperInterface {
+abstract class LocalStream extends StreamWrapperBase {
 
   use LocalStreamTrait;
-
-  /**
-   * Stream context resource.
-   *
-   * @var resource
-   */
-  public $context;
-
-  /**
-   * A generic resource handle.
-   *
-   * @var resource
-   */
-  public $handle = NULL;
-
-  /**
-   * Instance URI (stream).
-   *
-   * A stream is referenced as "scheme://target".
-   *
-   * @var string
-   */
-  protected $uri;
 
   /**
    * {@inheritdoc}
@@ -60,20 +37,6 @@ abstract class LocalStream implements StreamWrapperInterface {
    *   String specifying the path.
    */
   protected abstract function getDirectoryPath();
-
-  /**
-   * {@inheritdoc}
-   */
-  function setUri($uri) {
-    $this->uri = $uri;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  function getUri() {
-    return $this->uri;
-  }
 
   /**
    * {@inheritdoc}
