@@ -411,7 +411,12 @@ abstract class LocalStream extends StreamWrapperBase {
    */
   public function url_stat($uri, $flags) {
     $this->uri = $uri;
-    $path = $this->getLocalPath();
+    try {
+      $path = $this->getLocalPath();
+    }
+    catch (\InvalidArgumentException $e) {
+      return FALSE;
+    }
     // Suppress warnings if requested or if the file or directory does not
     // exist. This is consistent with PHP's plain filesystem stream wrapper.
     if ($flags & STREAM_URL_STAT_QUIET || !file_exists($path)) {
