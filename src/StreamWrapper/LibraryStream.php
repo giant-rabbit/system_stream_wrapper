@@ -27,7 +27,7 @@ class LibraryStream extends ExtensionStreamBase {
   protected function getOwnerName() {
     $name = parent::getOwnerName();
     $library_discovery = new LibraryDiscovery($this->getDrupalRoot());
-    $files = $library_discovery->scan();
+    $files = $library_discovery->scan(LibraryDiscovery::EXTENSION_TYPE);
     if (!isset($files[$name])) {
       throw new \InvalidArgumentException("Library $name does not exist");
     }
@@ -41,7 +41,7 @@ class LibraryStream extends ExtensionStreamBase {
   protected function getDirectoryPath() {
     $library_discovery = new LibraryDiscovery($this->getDrupalRoot());
     /** @var $files \Drupal\Core\Extension\Extension[] */
-    $files = $library_discovery->scan();
+    $files = $library_discovery->scan(LibraryDiscovery::EXTENSION_TYPE);
     $name = $this->getOwnerName();
     return $files[$name]->getPathname();
   }

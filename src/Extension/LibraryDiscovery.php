@@ -36,7 +36,7 @@ class LibraryDiscovery extends ExtensionDiscovery {
   /**
    * {@inheritdoc}
    */
-  protected function scanDirectory($dir) {
+  protected function scanDirectory($dir, $include_tests) {
     $files = array();
 
     // In order to scan top-level directories, absolute directory paths have to
@@ -93,13 +93,6 @@ class LibraryDiscovery extends ExtensionDiscovery {
     }
 
     return $files;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function scan() {
-    return parent::scan(self::EXTENSION_TYPE);
   }
 
 }
