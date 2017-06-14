@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\system_stream_wrapper\Extension\LibraryDiscovery.
- */
-
 namespace Drupal\system_stream_wrapper\Extension;
 
 use Drupal\Core\Extension\Extension;

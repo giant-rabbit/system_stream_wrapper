@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Core\StreamWrapper\LibraryStream.
- */
-
 namespace Drupal\system_stream_wrapper\StreamWrapper;
 
 use Drupal\system_stream_wrapper\Extension\LibraryDiscovery;
