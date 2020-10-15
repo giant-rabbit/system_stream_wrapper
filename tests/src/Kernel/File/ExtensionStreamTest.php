@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\Tests\system_stream_wrapper\Kernel\File\ExtensionStreamTest.
- */
-
 namespace Drupal\Tests\system_stream_wrapper\Kernel\File;
 
-use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -20,7 +14,7 @@ class ExtensionStreamTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['system', 'system_stream_wrapper'];
+  public static $modules = ['system', 'system_stream_wrapper', 'file_test'];
 
   /**
    * A list of extension stream wrappers keyed by scheme.
@@ -39,7 +33,7 @@ class ExtensionStreamTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
 
     // Find the base url to be used later in tests.
@@ -51,18 +45,6 @@ class ExtensionStreamTest extends KernelTestBase {
     foreach (['module', 'theme', 'profile'] as $scheme) {
       $this->streamWrappers[$scheme] = $stream_wrapper_manager->getViaScheme($scheme);
     }
-
-    /** @var \Drupal\Core\State\StateInterface $state */
-    $state = $this->container->get('state');
-
-    // Set 'minimal' as installed profile for the purposes of this test.
-    $system_module_files = $state->get('system.module.files', []);
-    $system_module_files += ['minimal' => 'core/profiles/minimal/minimal.info.yml'];
-    $state->set('system.module.files', $system_module_files);
-    // Add default profile for the purposes of this test.
-    new Settings(Settings::getAll() +  ['install_profile' => 'minimal']);
-    $this->config('core.extension')->set('module.minimal', 0)->save();
-    $this->container->get('module_handler')->addProfile('minimal', 'core/profiles/minimal');
 
     /** @var \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer */
     $theme_installer = $this->container->get('theme_installer');
@@ -79,6 +61,10 @@ class ExtensionStreamTest extends KernelTestBase {
    * @dataProvider providerInvalidUris
    */
   public function testInvalidStreamUri($uri) {
+    // Set 'minimal' as installed profile for the purposes of this test.
+    $this->setInstallProfile('minimal');
+    $this->enableModules(['minimal']);
+
     $message = "\\InvalidArgumentException thrown on invalid uri $uri.";
     try {
       $this->streamWrappers['module']->dirname($uri);
@@ -115,27 +101,31 @@ class ExtensionStreamTest extends KernelTestBase {
    *
    * @param string $uri
    *   The uri to be tested.
-   * @param string|\InvalidArgumentException $dirname
+   * @param string|\RuntimeException|\InvalidArgumentException $dirname
    *   The expectation for dirname() method.
-   * @param string|\InvalidArgumentException $realpath
+   * @param string\RuntimeException|\InvalidArgumentException $realpath
    *   The expectation for realpath() method.
-   * @param string|\InvalidArgumentException $getExternalUrl
+   * @param string|\RuntimeException|\InvalidArgumentException $getExternalUrl
    *   The expectation for getExternalUrl() method.
    *
    * @dataProvider providerStreamWrapperMethods
    */
   public function testStreamWrapperMethods($uri, $dirname, $realpath, $getExternalUrl) {
+    // Set 'minimal' as installed profile for the purposes of this test.
+    $this->setInstallProfile('minimal');
+    $this->enableModules(['minimal']);
+
     // Prefix realpath() expected value with Drupal root directory.
     $realpath = is_string($realpath) ? DRUPAL_ROOT . $realpath : $realpath;
     // Prefix getExternalUrl() expected value with base url.
     $getExternalUrl = is_string($getExternalUrl) ? "{$this->baseUrl}$getExternalUrl" : $getExternalUrl;
-    $case = compact($dirname, $realpath, $getExternalUrl);
+    $case = compact('dirname', 'realpath', 'getExternalUrl');
 
     foreach ($case as $method => $expected) {
-      list($scheme, ) = explode('://', $uri);
+      list($scheme,) = explode('://', $uri);
       $this->streamWrappers[$scheme]->setUri($uri);
-      if ($expected instanceof \InvalidArgumentException) {
-        /** @var \InvalidArgumentException $expected */
+      if ($expected instanceof \InvalidArgumentException || $expected instanceof \RuntimeException) {
+        /** @var \Exception $expected */
         $message = sprintf('Exception thrown: \InvalidArgumentException("%s").', $expected->getMessage());
         try {
           $this->streamWrappers[$scheme]->$method();
@@ -144,17 +134,24 @@ class ExtensionStreamTest extends KernelTestBase {
         catch (\InvalidArgumentException $e) {
           $this->assertSame($expected->getMessage(), $e->getMessage(), $message);
         }
+        catch (\RuntimeException $e) {
+          $this->assertSame($expected->getMessage(), $e->getMessage(), $message);
+        }
       }
       elseif (is_string($expected)) {
-        $this->assertSame($expected,  $this->streamWrappers[$scheme]->$method());
+        $this->assertSame($expected, $this->streamWrappers[$scheme]->$method());
       }
     }
   }
 
   /**
-   * Test when dirname() is called directly without setting a URI first.
+   * Tests call of ::dirname() without setting a URI first.
    */
   public function testDirnameAsParameter() {
+    // Set 'minimal' as installed profile for the purposes of this test.
+    $this->setInstallProfile('minimal');
+    $this->enableModules(['minimal']);
+
     $this->assertEquals('module://system', $this->streamWrappers['module']->dirname('module://system/system.admin.css'));
   }
 

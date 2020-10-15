@@ -13,7 +13,7 @@ class ProfileStream extends ModuleStream {
    * {@inheritdoc}
    */
   protected function getOwnerName() {
-    return drupal_get_profile();
+    return \Drupal::installProfile();
   }
 
   /**

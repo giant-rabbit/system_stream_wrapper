@@ -1,6 +1,7 @@
 <?php
 
 namespace Drupal\system_stream_wrapper\StreamWrapper;
+
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 
 /**
@@ -31,7 +32,7 @@ abstract class LocalStream extends StreamWrapperBase {
    * @return string
    *   String specifying the path.
    */
-  protected abstract function getDirectoryPath();
+  abstract protected function getDirectoryPath();
 
   /**
    * {@inheritdoc}
@@ -72,7 +73,8 @@ abstract class LocalStream extends StreamWrapperBase {
     $realpath = realpath($path);
     if (!$realpath) {
       // This file does not yet exist.
-      $realpath = realpath(dirname($path)) . '/' . drupal_basename($path);
+      $basename = \Drupal::service('file_system')->basename($path);
+      $realpath = realpath(dirname($path)) . '/' . $basename;
     }
     $directory = realpath($this->getDirectoryPath());
 
@@ -128,7 +130,7 @@ abstract class LocalStream extends StreamWrapperBase {
    * @see http://php.net/manual/streamwrapper.stream-lock.php
    */
   public function stream_lock($operation) {
-    if (in_array($operation, array(LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB))) {
+    if (in_array($operation, [LOCK_SH, LOCK_EX, LOCK_UN, LOCK_NB])) {
       return flock($this->handle, $operation);
     }
 
@@ -181,7 +183,7 @@ abstract class LocalStream extends StreamWrapperBase {
    * {@inheritdoc}
    */
   public function stream_seek($offset, $whence = SEEK_SET) {
-    // fseek returns 0 on success and -1 on a failure.
+    // Function fseek returns 0 on success and -1 on a failure.
     // stream_seek   1 on success and  0 on a failure.
     return !fseek($this->handle, $offset, $whence);
   }
@@ -313,13 +315,13 @@ abstract class LocalStream extends StreamWrapperBase {
    */
   public function unlink($uri) {
     $this->uri = $uri;
-    return drupal_unlink($this->getLocalPath());
+    return \Drupal::service('file_system')->unlink($this->getLocalPath());
   }
 
   /**
    * Support for rename().
    *
-   * @param string $from_uri,
+   * @param string $from_uri
    *   The URI to the file to rename.
    * @param string $to_uri
    *   The new URI for file.
@@ -360,10 +362,10 @@ abstract class LocalStream extends StreamWrapperBase {
       $localpath = $this->getLocalPath($uri);
     }
     if ($options & STREAM_REPORT_ERRORS) {
-      return drupal_mkdir($localpath, $mode, $recursive);
+      return \Drupal::service('file_system')->mkdir($localpath, $mode, $recursive);
     }
     else {
-      return @drupal_mkdir($localpath, $mode, $recursive);
+      return \Drupal::service('file_system')->mkdir($localpath, $mode, $recursive);
     }
   }
 
@@ -383,10 +385,10 @@ abstract class LocalStream extends StreamWrapperBase {
   public function rmdir($uri, $options) {
     $this->uri = $uri;
     if ($options & STREAM_REPORT_ERRORS) {
-      return drupal_rmdir($this->getLocalPath());
+      return \Drupal::service('file_system')->rmdir($this->getLocalPath());
     }
     else {
-      return @drupal_rmdir($this->getLocalPath());
+      return \Drupal::service('file_system')->rmdir($this->getLocalPath());
     }
   }
 
@@ -484,4 +486,5 @@ abstract class LocalStream extends StreamWrapperBase {
     // have a return value.
     return TRUE;
   }
+
 }
