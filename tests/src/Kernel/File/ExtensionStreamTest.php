@@ -101,9 +101,9 @@ class ExtensionStreamTest extends KernelTestBase {
    *
    * @param string $uri
    *   The uri to be tested.
-   * @param string|\RuntimeException|\InvalidArgumentException $dirname
+   * @param string $dirname
    *   The expectation for dirname() method.
-   * @param string\RuntimeException|\InvalidArgumentException $realpath
+   * @param string $realpath
    *   The expectation for realpath() method.
    * @param string|\RuntimeException|\InvalidArgumentException $getExternalUrl
    *   The expectation for getExternalUrl() method.
@@ -116,30 +116,30 @@ class ExtensionStreamTest extends KernelTestBase {
     $this->enableModules(['minimal']);
 
     // Prefix realpath() expected value with Drupal root directory.
-    $realpath = is_string($realpath) ? DRUPAL_ROOT . $realpath : $realpath;
+    $realpath = strpos($realpath, 'or is not') === FALSE ? DRUPAL_ROOT . $realpath : $realpath;
     // Prefix getExternalUrl() expected value with base url.
-    $getExternalUrl = is_string($getExternalUrl) ? "{$this->baseUrl}$getExternalUrl" : $getExternalUrl;
+    $getExternalUrl = strpos($getExternalUrl, 'or is not') === FALSE ? "{$this->baseUrl}$getExternalUrl" : $getExternalUrl;
     $case = compact('dirname', 'realpath', 'getExternalUrl');
 
     foreach ($case as $method => $expected) {
       list($scheme,) = explode('://', $uri);
       $this->streamWrappers[$scheme]->setUri($uri);
-      if ($expected instanceof \InvalidArgumentException || $expected instanceof \RuntimeException) {
+      if (strpos($expected, 'or is not') !== FALSE) {
         /** @var \Exception $expected */
-        $message = sprintf('Exception thrown: \InvalidArgumentException("%s").', $expected->getMessage());
+        $message = sprintf('Exception thrown: \InvalidArgumentException("%s").', $expected);
         try {
           $this->streamWrappers[$scheme]->$method();
           $this->fail($message);
         }
         catch (\InvalidArgumentException $e) {
-          $this->assertSame($expected->getMessage(), $e->getMessage(), $message);
+          $this->assertSame($expected, $e->getMessage(), $message);
         }
         catch (\RuntimeException $e) {
-          $this->assertSame($expected->getMessage(), $e->getMessage(), $message);
+          $this->assertSame($expected, $e->getMessage(), $message);
         }
       }
       elseif (is_string($expected)) {
-        $this->assertSame($expected, $this->streamWrappers[$scheme]->$method());
+        $this->assertSame($expected, $this->streamWrappers[$scheme]->$method(), sprintf("%s failed", $method));
       }
     }
   }
@@ -196,15 +196,15 @@ class ExtensionStreamTest extends KernelTestBase {
       ],
       [
         'module://ckeditor/ckeditor.info.yml',
-        new \InvalidArgumentException('Module ckeditor does not exist or is not installed'),
-        new \InvalidArgumentException('Module ckeditor does not exist or is not installed'),
-        new \InvalidArgumentException('Module ckeditor does not exist or is not installed'),
+        'Module ckeditor does not exist or is not installed',
+        'Module ckeditor does not exist or is not installed',
+        'Module ckeditor does not exist or is not installed',
       ],
       [
         'module://foo_bar/foo.bar.js',
-        new \InvalidArgumentException('Module foo_bar does not exist or is not installed'),
-        new \InvalidArgumentException('Module foo_bar does not exist or is not installed'),
-        new \InvalidArgumentException('Module foo_bar does not exist or is not installed'),
+        'Module foo_bar does not exist or is not installed',
+        'Module foo_bar does not exist or is not installed',
+        'Module foo_bar does not exist or is not installed',
       ],
       // Cases for theme:// stream wrapper.
       [
@@ -227,15 +227,15 @@ class ExtensionStreamTest extends KernelTestBase {
       ],
       [
         'theme://fifteen/screenshot.png',
-        new \InvalidArgumentException('Theme fifteen does not exist or is not installed'),
-        new \InvalidArgumentException('Theme fifteen does not exist or is not installed'),
-        new \InvalidArgumentException('Theme fifteen does not exist or is not installed'),
+        'Theme fifteen does not exist or is not installed',
+        'Theme fifteen does not exist or is not installed',
+        'Theme fifteen does not exist or is not installed',
       ],
       [
         'theme://stark/stark.info.yml',
-        new \InvalidArgumentException('Theme stark does not exist or is not installed'),
-        new \InvalidArgumentException('Theme stark does not exist or is not installed'),
-        new \InvalidArgumentException('Theme stark does not exist or is not installed'),
+        'Theme stark does not exist or is not installed',
+        'Theme stark does not exist or is not installed',
+        'Theme stark does not exist or is not installed',
       ],
       // Cases for profile:// stream wrapper.
       [
